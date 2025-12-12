@@ -1,0 +1,52 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "lib": [
+      "DOM",
+      "ES2022"
+    ],
+    "types": [
+      "vite/client",
+      "react",
+      "react-dom"
+    ],
+    "baseUrl": "src",
+    "paths": {
+      "common/*": [
+        "common/*"
+      ],
+      "components/*": [
+        "components/*"
+      ],
+      "utils/*": [
+        "utils/*"
+      ],
+      "hooks/*": [
+        "hooks/*"
+      ],
+      "layouts/*": [
+        "layouts/*"
+      ],
+      "modules/*": [
+        "modules/*"
+      ],
+      "store/*": [
+        "store/*"
+      ],
+      "types/*": [
+        "types/*"
+      ]
+    }
+  },
+  "include": [
+    "src",
+    "vite.config.ts",
+    "vite-plugin-react.d.ts"
+  ]
+}
