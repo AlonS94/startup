@@ -16,4 +16,9 @@ export default defineConfig({
       { find: 'types', replacement: path.resolve(__dirname, 'src/types') },
     ],
   },
+  build: {
+    outDir: 'build',
+    emptyOutDir: true,
+    sourcemap: false,
+  },
 });
