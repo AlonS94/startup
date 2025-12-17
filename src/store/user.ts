@@ -1,73 +1,18 @@
 import { makeAutoObservable } from 'mobx';
 import RootStore from './rootStore';
-import {
-  deleteSavedLogin,
-  getSavedLogin,
-  getToken,
-  getUser,
-  setSavedLogin,
-  setToken,
-  setUser,
-} from 'utils/auth';
-import { IUser } from 'types/user';
+import { ILogin, IUser } from 'types/user';
+import { createRequest } from 'utils/createRequest';
+import { setIsAuth, setLoginUser } from 'utils/auth';
 
 export default class User {
   rootStore: RootStore;
-  isAuth: boolean = false;
-  savedLogin: string | null = 'null';
+  login: string | null = null;
   isRemember: boolean = true;
+  isLoading: boolean = false;
 
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore;
     makeAutoObservable(this, {}, { autoBind: true });
-    this.loadInitialState();
-  }
-
-  loadInitialState() {
-    const token = getToken();
-    const saved = getSavedLogin();
-
-    this.setAuth(!!token);
-    this.setSavedLogin(saved);
-  }
-
-  register(user: IUser) {
-    this.setAuth(true);
-    setUser(user);
-  }
-
-  private setAuth(isAuth: boolean) {
-    this.isAuth = isAuth;
-  }
-
-  private setSavedLogin(savedLogin: string | null) {
-    this.savedLogin = savedLogin;
-  }
-
-  login(userData: IUser) {
-    const { email, password } = userData;
-
-    const userRaw = getUser(email);
-    if (!userRaw) {
-      throw new Error('Пользователь не найден');
-    }
-
-    const user: IUser = JSON.parse(userRaw);
-
-    if (user.password !== password) {
-      throw new Error('Неверный пароль');
-    }
-
-    if (this.isRemember) {
-      setSavedLogin(email);
-      this.setSavedLogin(email);
-    } else {
-      deleteSavedLogin();
-      this.setSavedLogin(null);
-    }
-
-    setToken(this.isRemember);
-    this.setAuth(true);
   }
 
   changeIsRemember(isRemember: boolean) {
@@ -75,9 +20,56 @@ export default class User {
   }
 
   logout() {
-    localStorage.removeItem('token');
-    sessionStorage.removeItem('token');
+    this.setLogin(null);
+    setIsAuth('false');
+  }
 
-    this.setAuth(false);
+  private setIsLoading(isLogin: boolean) {
+    this.isLoading = isLogin;
+  }
+
+  private setLogin(userData: ILogin | null) {
+    this.login = userData ? userData.user.login : null;
+  }
+
+  private handlerLogin(userData: ILogin | null) {
+    if (this.isRemember && userData) {
+      setLoginUser(userData.user.login);
+    }
+    this.setLogin(userData);
+  }
+
+  fetchLogin({ login, password }: IUser, onSuccess: () => void) {
+    this.setIsLoading(true);
+    createRequest<ILogin>({
+      body: { login, password },
+      path: 'login',
+      onSuccess: (data) => {
+        this.handlerLogin(data);
+        setIsAuth('true');
+        onSuccess();
+      },
+      method: 'POST',
+      onError: (err) => console.log(err),
+    })().finally(() => {
+      this.setIsLoading(false);
+    });
+  }
+
+  fetchRegister({ login, password }: IUser, onSuccess: () => void) {
+    this.setIsLoading(true);
+    createRequest<ILogin>({
+      body: { login, password },
+      path: 'register',
+      onSuccess: (data) => {
+        this.handlerLogin(data);
+        setIsAuth('true');
+        onSuccess();
+      },
+      method: 'POST',
+      onError: (err) => console.log(err),
+    })().finally(() => {
+      this.setIsLoading(false);
+    });
   }
 }

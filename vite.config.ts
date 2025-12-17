@@ -14,6 +14,7 @@ export default defineConfig({
       { find: 'store', replacement: path.resolve(__dirname, 'src/store') },
       { find: 'utils', replacement: path.resolve(__dirname, 'src/utils') },
       { find: 'types', replacement: path.resolve(__dirname, 'src/types') },
+      { find: 'constants', replacement: path.resolve(__dirname, 'src/constants') },
     ],
   },
   build: {
