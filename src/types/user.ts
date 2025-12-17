@@ -1,4 +1,8 @@
 export interface IUser {
-  email: string;
-  password: string; // только локально. С беком здесь не будет пароля.
+  login: string;
+  password: string;
+}
+
+export interface ILogin {
+  user: { id: number; login: string };
 }

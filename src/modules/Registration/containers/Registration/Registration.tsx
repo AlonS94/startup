@@ -16,22 +16,15 @@ export const Registration = () => {
   const navigate = useNavigate();
 
   const onFinish = (userData: IUser) => {
-    user.register(userData);
-    navigate('/');
+    user.fetchRegister(userData, () => navigate('/'));
   };
 
   return (
     <div className={styles.wrapper}>
       <Typography.Title level={1}>Регистрация</Typography.Title>
-      <Typography.Title level={5}>не вводи настоящие данные, это тест версия</Typography.Title>
-      <Form
-        name="login"
-        initialValues={{ remember: true }}
-        onFinish={onFinish}
-        validateTrigger="onSubmit"
-      >
-        <Form.Item name="mail" rules={[{ required: true, message: 'Не заполнено поле - почта' }]}>
-          <Input prefix={<UserOutlined />} placeholder="Email" />
+      <Form name="login" onFinish={onFinish} validateTrigger="onSubmit">
+        <Form.Item name="login" rules={[{ required: true, message: 'Не заполнено поле - почта' }]}>
+          <Input prefix={<UserOutlined />} placeholder="login" />
         </Form.Item>
         <Form.Item
           name="password"
@@ -64,11 +57,12 @@ export const Registration = () => {
         </Form.Item>
         <Form.Item style={{ marginBottom: 0 }}>
           <Flex vertical align="center" gap="middle">
-            <Button block type="primary" htmlType="submit">
+            <Button block type="primary" htmlType="submit" loading={user.isLoading}>
               Зарегистрироваться
             </Button>
             <Flex gap={4}>
-              Есть учётная запись? <a href="/auth/login">Войти</a>
+              Есть учётная запись?
+              <Typography.Link onClick={() => navigate('/auth/login')}>Войти</Typography.Link>
             </Flex>
           </Flex>
         </Form.Item>
